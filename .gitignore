@@ -1,0 +1,6 @@
+*.iml
+.idea
+
+main
+go.mod
+go.sum
