@@ -16,10 +16,10 @@ var (
 )
 
 type luaConfig struct {
-	Name     string `json:"name"     lua:"name"`
-	Service  string `json:"service"  lua:"service"`
-	Endpoint string `json:"endpoint" lua:"endpoint"`
-	Password string `json:"password" lua:"password"`
+	Name     string `json:"name"     lua:"name"`     // lua 服务名称
+	Service  string `json:"service"  lua:"service"`  // rpcx server 端服务名称
+	Endpoint string `json:"endpoint" lua:"endpoint"` // etcd 注册中心地址
+	Password string `json:"password" lua:"password"` // etcd 注册中心密码
 }
 
 type luaClient struct {
@@ -71,4 +71,32 @@ func (c *luaClient) Close() error {
 	}
 	c.S = lua.CLOSE
 	return nil
+}
+
+func (c *luaClient) Call(state *lua.LState) int {
+	top := state.GetTop()
+	if top != 4 {
+		state.RaiseError("%v", "参数错误, 需要 4 个参数")
+		return 0
+	}
+
+	svc := state.CheckString(1)
+	method := state.CheckString(2)
+	args := state.CheckAnyData(3)
+	reply := state.CheckAnyData(4)
+	if err := c.cli.Call(nil, svc, method, args.Value, reply.Value); err != nil {
+		state.Push(lua.NewAnyData(err))
+	} else {
+		state.Push(lua.LNil)
+	}
+	return 1
+}
+
+// Index 注册方法
+func (c *luaClient) Index(state *lua.LState, key string) lua.LValue {
+	switch key {
+	case "call":
+		return lua.NewFunction(c.Call)
+	}
+	return lua.LNil
 }
