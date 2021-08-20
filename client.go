@@ -3,6 +3,7 @@ package rpcxcli
 import (
 	"context"
 	"errors"
+	"github.com/smallnest/rpcx/share"
 
 	"github.com/smallnest/rpcx/client"
 	clientv3 "go.etcd.io/etcd/client/v3"
@@ -49,12 +50,10 @@ func (c *rpcxClient) Close() (err error) {
 }
 
 // Call 调用服务
-func (c *rpcxClient) Call(ctx context.Context, svc, method string, args, reply interface{}) error {
+func (c *rpcxClient) Call(svc, method string, args, reply interface{}) error {
 	if c.rpcClient == nil {
 		return errors.New("client 未 start")
 	}
-	if ctx == nil {
-		ctx = context.Background()
-	}
+	ctx := context.WithValue(context.Background(), share.ReqMetaDataKey, make(map[string]string))
 	return c.rpcClient.Call(ctx, svc, method, args, reply)
 }

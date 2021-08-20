@@ -84,7 +84,7 @@ func (c *luaClient) Call(state *lua.LState) int {
 	method := state.CheckString(2)
 	args := state.CheckAnyData(3)
 	reply := state.CheckAnyData(4)
-	if err := c.cli.Call(nil, svc, method, args.Value, reply.Value); err != nil {
+	if err := c.cli.Call(svc, method, args.Value, reply.Value); err != nil {
 		state.Push(lua.NewAnyData(err))
 	} else {
 		state.Push(lua.LNil)
