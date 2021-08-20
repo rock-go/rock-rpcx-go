@@ -13,13 +13,14 @@ type rpcxClient struct {
 	cfg       clientv3.Config
 	discovery client.ServiceDiscovery
 	svc       string
+	token     string
 
 	ctx    context.Context
 	cancel context.CancelFunc
 }
 
 // New 新建客户端
-func New(svc string, cfg clientv3.Config) *rpcxClient {
+func New(svc, token string, cfg clientv3.Config) *rpcxClient {
 	cli := &rpcxClient{cfg: cfg, svc: svc}
 	cli.ctx, cli.cancel = context.WithCancel(context.Background())
 	return cli
@@ -35,6 +36,7 @@ func (c *rpcxClient) Start() error {
 		return err
 	}
 	c.rpcClient = client.NewOneClient(client.Failtry, client.RandomSelect, d, client.DefaultOption)
+	c.rpcClient.Auth(c.token)
 	return nil
 }
 

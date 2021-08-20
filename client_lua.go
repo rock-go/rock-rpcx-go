@@ -47,7 +47,7 @@ func newClient(state *lua.LState) int {
 	endpoint := strings.ReplaceAll(conf.Endpoint, " ", "")
 	endpoints := strings.Split(endpoint, ",")
 	cfg := clientv3.Config{Endpoints: endpoints, Username: node.ID(), Password: conf.Password}
-	cli.cli = New(conf.Service, cfg)
+	cli.cli = New(conf.Service, node.ID(), cfg)
 	cli.S = lua.INIT
 
 	proc := state.NewProc(conf.Name, _TypeOfLuaClient)
