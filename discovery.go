@@ -49,6 +49,7 @@ func (d *discovery) Start() (err error) {
 
 // GetServices 获取所有的服务
 func (d *discovery) GetServices() []*client.KVPair {
+	//return []*client.KVPair{&client.KVPair{Key: "tcp@172.31.61.168:8082"}}
 	return d.pairs
 }
 

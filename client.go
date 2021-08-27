@@ -22,7 +22,7 @@ type rpcxClient struct {
 
 // New 新建客户端
 func New(svc, token string, cfg clientv3.Config) *rpcxClient {
-	cli := &rpcxClient{cfg: cfg, svc: svc}
+	cli := &rpcxClient{cfg: cfg, svc: svc , token: token}
 	cli.ctx, cli.cancel = context.WithCancel(context.Background())
 	return cli
 }

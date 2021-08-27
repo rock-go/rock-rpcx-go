@@ -75,21 +75,26 @@ func (c *luaClient) Close() error {
 
 func (c *luaClient) Call(state *lua.LState) int {
 	top := state.GetTop()
-	if top != 4 {
-		state.RaiseError("%v", "参数错误, 需要 4 个参数")
+	if top != 3 {
+		state.RaiseError("%v", "参数错误, 需要 3 个参数")
 		return 0
 	}
 
 	svc := state.CheckString(1)
 	method := state.CheckString(2)
 	args := state.CheckAnyData(3)
-	reply := state.CheckAnyData(4)
-	if err := c.cli.Call(svc, method, args.Value, reply.Value); err != nil {
-		state.Push(lua.NewAnyData(err))
+	//reply := state.CheckAnyData(4)
+
+	reply := struct{}{}
+
+	if err := c.cli.Call(svc, method, args.Value, &reply); err != nil {
+		state.Push(lua.LNil)
+		state.Push(lua.S2L(err.Error()))
 	} else {
+		state.Push(state.NewAnyData(&reply))
 		state.Push(lua.LNil)
 	}
-	return 1
+	return 2
 }
 
 // Index 注册方法
